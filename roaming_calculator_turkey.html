@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор роуминга — Турция (Билайн)</title>
+  <style>
+    :root{--bg:#fff;--fg:#111827;--muted:#6b7280;--border:#e5e7eb;--card:#fff}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);margin:0}
+    .wrap{max-width:1040px;margin:0 auto;padding:24px}
+    h1{margin:0 0 8px;font-size:26px}
+    h2{margin:0 0 10px;font-size:18px}
+    h3{margin:0 0 8px;font-size:16px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}}
+    .card{border:1px solid var(--border);border-radius:16px;padding:16px;background:var(--card);box-shadow:0 1px 6px rgba(0,0,0,.06)}
+    .row{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:8px}
+    input[type=number]{width:120px;padding:8px;text-align:right;border:1px solid var(--border);border-radius:8px}
+    input[type=checkbox]{transform:scale(1.1)}
+    .btn{padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:#fff;cursor:pointer}
+    .btn.active{background:#f3f4f6;border-color:#9ca3af}
+    ul{margin:0;padding-left:18px}
+    small{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Калькулятор роуминга (Турция, Билайн)</h1>
+    <p class="muted">Работает офлайн, без React. Меняйте параметры — цифры пересчитываются мгновенно.</p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h2>Пакет и стоимость</h2>
+
+        <label class="row"><span>Цена пакета, ₽</span>
+          <input id="priceRub" type="number" value="1400">
+        </label>
+
+        <label class="row"><span>Размер пакета, ГБ</span>
+          <input id="packageGB" type="number" value="1" step="0.5" min="0.5">
+        </label>
+
+        <label class="row"><span>Суток использования</span>
+          <input id="days" type="number" value="7" min="1">
+        </label>
+
+        <div class="row">
+          <span>1 ГБ =</span>
+          <span>
+            <button id="btn1000" class="btn active">1000 МБ</button>
+            <button id="btn1024" class="btn">1024 МБ</button>
+          </span>
+        </div>
+
+        <div style="margin-top:8px">
+          <label style="margin-right:16px"><input id="unlimMaps" type="checkbox"> Безлимитные карты</label>
+          <label><input id="unlimMessengers" type="checkbox"> Безлимитные мессенджеры</label>
+        </div>
+        <small>Для экономии оставь обе галочки выключенными.</small>
+      </div>
+
+      <div class="card" style="background:#f7f7f8">
+        <h2>Итоги</h2>
+        <ul>
+          <li>Платный трафик в день: <b><span id="mbDayPaid">0</span></b> МБ</li>
+          <li>За период: <b><span id="totalMB">0</span></b> МБ</li>
+          <li>Объём пакета: <b><span id="packageMB">0</span></b> МБ</li>
+          <li>«Использовано из пакета»: <b><span id="estCostRub">0</span></b> ₽ из <span id="priceRubEcho">1400</span> ₽</li>
+          <li>Запас трафика: <b><span id="spareMB">0</span></b> МБ</li>
+          <li>Цена 1 МБ: ~<b><span id="perMB">0</span></b> ₽/МБ</li>
+        </ul>
+        <small>Если «За период» намного меньше «Объёма пакета» — можно брать пакет поменьше.</small>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>Ежедневное использование</h2>
+      <div class="grid g3">
+        <div>
+          <h3>Карты</h3>
+          <label class="row"><span>Маршрутов/день</span><input id="mapsRoutesPerDay" type="number" value="2"></label>
+          <label class="row"><span>Минут навигации/день</span><input id="mapsNavMinutesPerDay" type="number" value="60"></label>
+          <small>~<span id="mbMaps">0</span> МБ/день (до безлимита)</small>
+        </div>
+
+        <div>
+          <h3>WhatsApp</h3>
+          <label class="row"><span>Текстов/день</span><input id="waTextsPerDay" type="number" value="20"></label>
+          <label class="row"><span>Фото/день</span><input id="waPhotosPerDay" type="number" value="2"></label>
+          <label class="row"><span>Звонков (мин)/день</span><input id="waCallsMinPerDay" type="number" value="0"></label>
+        </div>
+
+        <div>
+          <h3>Telegram</h3>
+          <label class="row"><span>Текстов/день</span><input id="tgTextsPerDay" type="number" value="20"></label>
+          <label class="row"><span>Фото/день</span><input id="tgPhotosPerDay" type="number" value="2"></label>
+          <label class="row"><span>Коротких видео (10с)/день</span><input id="tgShortVideosPerDay" type="number" value="0"></label>
+        </div>
+      </div>
+
+      <div class="grid g3" style="margin-top:12px">
+        <div>
+          <h3>Прочее</h3>
+          <label class="row"><span>Вызовов такси/день</span><input id="taxiRequestsPerDay" type="number" value="1"></label>
+          <label class="row"><span>Проверок почты/день</span><input id="emailChecksPerDay" type="number" value="1"></label>
+          <label class="row"><span>Веб‑страниц/день</span><input id="webPagesPerDay" type="number" value="2"></label>
+          <small>Прочее ~<span id="mbMisc">0</span> МБ/день</small>
+        </div>
+
+        <div>
+          <h3>Вес действий (МБ)</h3>
+          <label class="row"><span>mapsRoute</span><input id="w_mapsRoute" type="number" step="0.1" value="3"></label>
+          <label class="row"><span>mapsNavPerMin</span><input id="w_mapsNavPerMin" type="number" step="0.1" value="0.5"></label>
+          <label class="row"><span>waText</span><input id="w_waText" type="number" step="0.01" value="0.02"></label>
+          <label class="row"><span>waPhoto</span><input id="w_waPhoto" type="number" step="0.1" value="0.4"></label>
+          <label class="row"><span>waCallPerMin</span><input id="w_waCallPerMin" type="number" step="0.1" value="0.8"></label>
+          <label class="row"><span>tgText</span><input id="w_tgText" type="number" step="0.01" value="0.02"></label>
+          <label class="row"><span>tgPhoto</span><input id="w_tgPhoto" type="number" step="0.1" value="0.5"></label>
+          <label class="row"><span>tgShortVideo10s</span><input id="w_tgShortVideo10s" type="number" step="0.1" value="3.5"></label>
+          <label class="row"><span>taxiRequest</span><input id="w_taxiRequest" type="number" step="0.1" value="1.5"></label>
+          <label class="row"><span>emailCheck</span><input id="w_emailCheck" type="number" step="0.1" value="1.5"></label>
+          <label class="row"><span>webPage</span><input id="w_webPage" type="number" step="0.1" value="2"></label>
+        </div>
+
+        <div>
+          <h3>Пресеты</h3>
+          <button class="btn" id="presetEconom">Эконом (твой)</button>
+          <button class="btn" id="presetMax" style="margin-left:8px">Максимум (безлимиты ON)</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="wrap"><small>* Оценки трафика ориентировочные; зависят от приложений и качества сети.</small></footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    // State
+    const state = {
+      mbPerGB: 1000
+    };
+
+    function readNum(id){ return Number($(id).value)||0; }
+    function readBool(id){ return $(id).checked; }
+    function fmt(n){ return (Math.round(n*10)/10).toLocaleString('ru-RU'); }
+
+    function recalc(){
+      // Inputs
+      const priceRub = readNum('priceRub');
+      const packageGB = readNum('packageGB');
+      const days = readNum('days');
+      const unlimMaps = readBool('unlimMaps');
+      const unlimMess = readBool('unlimMessengers');
+
+      const mapsRoutesPerDay = readNum('mapsRoutesPerDay');
+      const mapsNavMinutesPerDay = readNum('mapsNavMinutesPerDay');
+      const waTextsPerDay = readNum('waTextsPerDay');
+      const waPhotosPerDay = readNum('waPhotosPerDay');
+      const waCallsMinPerDay = readNum('waCallsMinPerDay');
+      const tgTextsPerDay = readNum('tgTextsPerDay');
+      const tgPhotosPerDay = readNum('tgPhotosPerDay');
+      const tgShortVideosPerDay = readNum('tgShortVideosPerDay');
+      const taxiRequestsPerDay = readNum('taxiRequestsPerDay');
+      const emailChecksPerDay = readNum('emailChecksPerDay');
+      const webPagesPerDay = readNum('webPagesPerDay');
+
+      // Weights
+      const w = {
+        mapsRoute: readNum('w_mapsRoute'),
+        mapsNavPerMin: readNum('w_mapsNavPerMin'),
+        waText: readNum('w_waText'),
+        waPhoto: readNum('w_waPhoto'),
+        waCallPerMin: readNum('w_waCallPerMin'),
+        tgText: readNum('w_tgText'),
+        tgPhoto: readNum('w_tgPhoto'),
+        tgShortVideo10s: readNum('w_tgShortVideo10s'),
+        taxiRequest: readNum('w_taxiRequest'),
+        emailCheck: readNum('w_emailCheck'),
+        webPage: readNum('w_webPage'),
+      };
+
+      // MB calculations
+      const mbMaps = mapsRoutesPerDay*w.mapsRoute + mapsNavMinutesPerDay*w.mapsNavPerMin;
+      const mbWA = waTextsPerDay*w.waText + waPhotosPerDay*w.waPhoto + waCallsMinPerDay*w.waCallPerMin;
+      const mbTG = tgTextsPerDay*w.tgText + tgPhotosPerDay*w.tgPhoto + tgShortVideosPerDay*w.tgShortVideo10s;
+      const mbMisc = taxiRequestsPerDay*w.taxiRequest + emailChecksPerDay*w.emailCheck + webPagesPerDay*w.webPage;
+
+      const mbDayPaid = (unlimMaps?0:mbMaps) + (unlimMess?0:(mbWA+mbTG)) + mbMisc;
+      const totalMB = mbDayPaid * days;
+      const packageMB = packageGB * state.mbPerGB;
+      const perMBPrice = priceRub / (packageMB || 1);
+      const estCostRub = Math.min(totalMB, packageMB) * perMBPrice;
+      const spareMB = Math.max(packageMB - totalMB, 0);
+
+      // Output
+      $('mbMaps').textContent = fmt(mbMaps);
+      $('mbMisc').textContent = fmt(mbMisc);
+      $('mbDayPaid').textContent = fmt(mbDayPaid);
+      $('totalMB').textContent = fmt(totalMB);
+      $('packageMB').textContent = fmt(packageMB);
+      $('perMB').textContent = (Math.round(perMBPrice*1000)/1000).toFixed(3);
+      $('estCostRub').textContent = fmt(estCostRub);
+      $('spareMB').textContent = fmt(spareMB);
+      $('priceRubEcho').textContent = fmt(priceRub);
+    }
+
+    function bindAll(){
+      const inputs = document.querySelectorAll('input');
+      inputs.forEach(el => {
+        el.addEventListener('input', recalc);
+        el.addEventListener('change', recalc);
+      });
+      // GB buttons
+      $('btn1000').addEventListener('click', ()=>{ state.mbPerGB=1000; $('btn1000').classList.add('active'); $('btn1024').classList.remove('active'); recalc(); });
+      $('btn1024').addEventListener('click', ()=>{ state.mbPerGB=1024; $('btn1024').classList.add('active'); $('btn1000').classList.remove('active'); recalc(); });
+
+      // Presets
+      $('presetEconom').addEventListener('click', ()=>{
+        $('unlimMaps').checked = false;
+        $('unlimMessengers').checked = false;
+        $('mapsRoutesPerDay').value = 2;
+        $('mapsNavMinutesPerDay').value = 60;
+        $('waTextsPerDay').value = 20;
+        $('waPhotosPerDay').value = 2;
+        $('waCallsMinPerDay').value = 0;
+        $('tgTextsPerDay').value = 20;
+        $('tgPhotosPerDay').value = 2;
+        $('tgShortVideosPerDay').value = 0;
+        $('taxiRequestsPerDay').value = 1;
+        $('emailChecksPerDay').value = 1;
+        $('webPagesPerDay').value = 2;
+        recalc();
+      });
+
+      $('presetMax').addEventListener('click', ()=>{
+        $('unlimMaps').checked = true;
+        $('unlimMessengers').checked = true;
+        $('mapsRoutesPerDay').value = 4;
+        $('mapsNavMinutesPerDay').value = 90;
+        $('waTextsPerDay').value = 60;
+        $('waPhotosPerDay').value = 6;
+        $('waCallsMinPerDay').value = 5;
+        $('tgTextsPerDay').value = 60;
+        $('tgPhotosPerDay').value = 6;
+        $('tgShortVideosPerDay').value = 3;
+        $('taxiRequestsPerDay').value = 2;
+        $('emailChecksPerDay').value = 2;
+        $('webPagesPerDay').value = 6;
+        recalc();
+      });
+    }
+
+    bindAll();
+    recalc();
+  </script>
+</body>
+</html>
